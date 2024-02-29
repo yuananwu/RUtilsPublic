@@ -196,7 +196,7 @@ scale01 = function(v){
   return((v-min(v))/(max(v)-min(v)))
 }
 #获取相关性剔除特征的结果
-getCorFilterRst = function(df, colsIn){
+getCorFilterRst = function(df, colsIn, survLabel){
   corMat = getCorMat(df, colsIn)
   relatePairedIdx = which(corMat > 0.6, arr.ind = T)
   rstList = NULL
@@ -205,7 +205,7 @@ getCorFilterRst = function(df, colsIn){
     idx2 = relatePairedIdx[pair, 2]
     c1 = colsIn[idx1]
     c2 = colsIn[idx2]
-    md = step(coxph(as.formula(paste(label, '~', paste(c(c1, c2),collapse = '+'))), data = df), direction = 'backward', trace = F)
+    md = step(coxph(as.formula(paste(survLabel, '~', paste(c(c1, c2),collapse = '+'))), data = df), direction = 'backward', trace = F)
     ag = md$assign
     if(length(ag) == 1){
       method = '后向cox保留'
@@ -225,7 +225,7 @@ getCorFilterRst = function(df, colsIn){
   return(rstList)
 }
 # 共线性分析
-getVifRst = function(df, cols, saveLogPath = NULL){
+getVifRst = function(df, cols, saveLogPath = NULL, survLabel){
   delCols = c()
   itor = 1
   vifExistFlag = T # 是否还存在共线性的特征，如果为F就不再执行迭代
@@ -234,7 +234,7 @@ getVifRst = function(df, cols, saveLogPath = NULL){
     mdCols = setdiff(cols, delCols)
     fit = rms::cph(
       data=df
-      ,as.formula(paste(label,'~',paste(mdCols,collapse = '+')))
+      ,as.formula(paste(survLabel,'~',paste(mdCols,collapse = '+')))
     )
     vifV = rms::vif(fit)
     if (max(vifV) > 2){ 
