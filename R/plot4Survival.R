@@ -1,7 +1,7 @@
 library('survival')
 library('survminer')
 library('rms')
-library('survcomp')
+# library('survcomp')
 library('pec') ##验证模型
 library('timeROC')
 library('CsChange')
